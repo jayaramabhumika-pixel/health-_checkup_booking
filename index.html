@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Easy Health Care</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+    font-family: Arial;
+    background: #eaf4ff;
+    margin: 0;
+    color: #123;
+}
+
+header {
+    background: #075a9c;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+header h1 {
+    font-size: 35px;
+}
+
+.container {
+    background: white;
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+h2 {
+    color: #075a9c;
+    font-size: 28px;
+}
+
+label {
+    display: block;
+    font-size: 21px;
+    font-weight: bold;
+    margin-top: 18px;
+}
+
+input, select {
+    width: 100%;
+    padding: 15px;
+    font-size: 19px;
+    margin-top: 8px;
+    box-sizing: border-box;
+    border: 2px solid #777;
+    border-radius: 8px;
+}
+
+button {
+    width: 100%;
+    padding: 17px;
+    margin-top: 20px;
+    background: #075a9c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 21px;
+    cursor: pointer;
+}
+
+.voice {
+    background: #16834a;
+}
+
+#message {
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Easy Health Care</h1>
+    <h2 style="color:white">Senior Citizen Health Booking</h2>
+    <p>Simple Healthcare For Everyone</p>
+</header>
+
+<div class="container">
+
+<h2>Welcome!</h2>
+
+<p style="font-size:21px">
+Book your health check-up independently.
+</p>
+
+<button class="voice" onclick="speak()">
+🔊 Voice Assistance
+</button>
+
+<form id="bookingForm">
+
+<label>Patient Name</label>
+<input id="name" type="text" required placeholder="Enter your name">
+
+<label>Age</label>
+<input id="age" type="number" min="1" max="120" required placeholder="Enter your age">
+
+<label>Phone Number</label>
+<input id="phone" type="tel" pattern="[0-9]{10}" required placeholder="10 digit number">
+
+<label>Select Hospital</label>
+<select id="hospital">
+<option>City Hospital</option>
+<option>General Hospital</option>
+<option>Care Hospital</option>
+</select>
+
+<label>Health Check-Up</label>
+<select id="checkup">
+<option>General Check-up</option>
+<option>Eye Check-up</option>
+<option>Blood Test</option>
+<option>Full Body Check-up</option>
+</select>
+
+<label>Appointment Date</label>
+<input id="date" type="date" required>
+
+<button type="submit">
+Book Appointment
+</button>
+
+</form>
+
+<button class="voice" onclick="readDetails()">
+🔊 Read My Details
+</button>
+
+<p id="message"></p>
+
+</div>
+
+<script>
+function speak() {
+    let msg = "Welcome to Easy Health Care. "
+    + "Please enter your name, age, phone number "
+    + "and select your hospital and checkup date.";
+
+    let speech = new SpeechSynthesisUtterance(msg);
+    speechSynthesis.cancel();
+    speechSynthesis.speak(speech);
+}
+
+function readDetails() {
+    let name = document.getElementById("name").value;
+    let age = document.getElementById("age").value;
+
+    let speech = new SpeechSynthesisUtterance(
+        "Your name is " + name + " and your age is " + age
+    );
+
+    speechSynthesis.speak(speech);
+}
+
+document.getElementById("bookingForm").onsubmit =
+async function(e) {
+
+    e.preventDefault();
+
+    let data = {
+        name: document.getElementById("name").value,
+        age: document.getElementById("age").value,
+        phone: document.getElementById("phone").value,
+        hospital: document.getElementById("hospital").value,
+        checkup: document.getElementById("checkup").value,
+        date: document.getElementById("date").value
+    };
+
+    try {
+        let response = await fetch("/book", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        let result = await response.json();
+
+        document.getElementById("message").innerText =
+            result.message;
+
+        if(response.ok) {
+            document.getElementById("bookingForm").reset();
+        }
+
+    } catch(error) {
+        document.getElementById("message").innerText =
+            "Unable to connect. Please try again.";
+    }
+};
+</script>
+
+</body>
+</html>
